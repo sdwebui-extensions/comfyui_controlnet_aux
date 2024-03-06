@@ -14,10 +14,17 @@ here = Path(__file__).parent.resolve()
 
 config_path = Path(here, "config.yaml")
 
+from comfy.cli_args import args
+
 if os.path.exists(config_path):
     config = yaml.load(open(config_path, "r"), Loader=yaml.FullLoader)
 
-    annotator_ckpts_path = str(Path(here, config["annotator_ckpts_path"]))
+    if args.data_dir:
+        annotator_ckpts_path = os.path.join(args.data_dir, 'models/ckpts')
+        if args.just_ui:
+            annotator_ckpts_path = os.path.join(os.path.dirname(args.data_dir), 'models/ckpts')
+    else:
+        annotator_ckpts_path =  str(Path(here, config["annotator_ckpts_path"]))
     USE_SYMLINKS = config["USE_SYMLINKS"]
     ORT_PROVIDERS = config["EP_list"]
 
@@ -32,7 +39,12 @@ if os.path.exists(config_path):
             log.error("Failed to create config ckpts directory. Using default.")
             annotator_ckpts_path = str(Path(here, "./ckpts"))
 else:
-    annotator_ckpts_path = str(Path(here, "./ckpts"))
+    if args.data_dir:
+        annotator_ckpts_path = os.path.join(args.data_dir, 'models/ckpts')
+        if args.just_ui:
+            annotator_ckpts_path = os.path.join(os.path.dirname(args.data_dir), 'models/ckpts')
+    else:
+        annotator_ckpts_path = str(Path(here, "./ckpts"))
     USE_SYMLINKS = False
     ORT_PROVIDERS = ["CUDAExecutionProvider", "DirectMLExecutionProvider", "OpenVINOExecutionProvider", "ROCMExecutionProvider", "CPUExecutionProvider", "CoreMLExecutionProvider"]
 
