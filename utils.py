@@ -47,7 +47,15 @@ else:
         annotator_ckpts_path = str(Path(here, "./ckpts"))
     USE_SYMLINKS = False
     ORT_PROVIDERS = ["CUDAExecutionProvider", "DirectMLExecutionProvider", "OpenVINOExecutionProvider", "ROCMExecutionProvider", "CPUExecutionProvider", "CoreMLExecutionProvider"]
-
+if os.path.exists('/stable-diffusion-cache/models/ckpts'):
+    for upper_folder, _, filenames in os.walk('/stable-diffusion-cache/models/ckpts'):
+        for filename in filenames:
+            cache_path = os.path.join(upper_folder, filename)
+            tgt_path = cache_path.replace('/stable-diffusion-cache/models/ckpts', annotator_ckpts_path)
+            if not os.path.exists(tgt_path):
+                if not os.path.exists(os.path.dirname(tgt_path)):
+                    os.makedirs(os.path.dirname(tgt_path), exist_ok=True)
+                os.system(f'cp {cache_path} {tgt_path}')
 os.environ['AUX_USE_SYMLINKS'] = str(USE_SYMLINKS)
 os.environ['AUX_ANNOTATOR_CKPTS_PATH'] = annotator_ckpts_path
 os.environ['AUX_ORT_PROVIDERS'] = str(",".join(ORT_PROVIDERS))
