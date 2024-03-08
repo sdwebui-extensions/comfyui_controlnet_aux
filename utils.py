@@ -59,7 +59,8 @@ if os.path.exists('/stable-diffusion-cache/models/ckpts'):
                     os.makedirs(os.path.dirname(tgt_path), exist_ok=True)
                 ckpt_fp_file_pairs.append([cache_path, tgt_path])
                 # os.system(f'cp {cache_path} {tgt_path}')
-    async_file_cp(ckpt_fp_file_pairs)
+    if not args.just_ui:
+        async_file_cp(ckpt_fp_file_pairs)
 os.environ['AUX_USE_SYMLINKS'] = str(USE_SYMLINKS)
 os.environ['AUX_ANNOTATOR_CKPTS_PATH'] = annotator_ckpts_path
 os.environ['AUX_ORT_PROVIDERS'] = str(",".join(ORT_PROVIDERS))
