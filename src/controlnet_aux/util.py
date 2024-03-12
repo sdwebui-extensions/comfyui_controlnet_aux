@@ -8,6 +8,7 @@ from pathlib import Path
 import warnings
 from torch.hub import get_dir, download_url_to_file
 from huggingface_hub import hf_hub_download
+import tempfile
 
 
 TORCHHUB_PATH = Path(__file__).parent / 'depth_anything' / 'torchhub'
@@ -21,6 +22,7 @@ UNIMATCH_MODEL_NAME = "hr16/Unimatch"
 DEPTH_ANYTHING_MODEL_NAME = "LiheYoung/Depth-Anything" #HF Space
 DIFFUSION_EDGE_MODEL_NAME = "hr16/Diffusion-Edge"
 
+temp_dir = tempfile.gettempdir()
 annotator_ckpts_path = os.path.join(Path(__file__).parents[2], 'ckpts')
 USE_SYMLINKS = False
 
@@ -34,6 +36,15 @@ try:
     USE_SYMLINKS = eval(os.environ['AUX_USE_SYMLINKS'])
 except:
     warnings.warn("USE_SYMLINKS not set successfully. Using default value: False to download models.")
+    pass
+
+try:
+    temp_dir = os.environ['AUX_TEMP_DIR']
+    if len(temp_dir) >= 60:
+        warnings.warn(f"custom temp dir is too long. Using default")
+        temp_dir = tempfile.gettempdir()
+except:
+    warnings.warn(f"custom temp dir not set successfully")
     pass
 
 here = Path(__file__).parent.resolve()
@@ -238,12 +249,13 @@ def check_hash_from_torch_hub(file_path, filename):
     curr_hash = sha256sum(file_path)
     return curr_hash[:len(ref_hash)] == ref_hash
 
-def custom_torch_download(filename, cache_dir=annotator_ckpts_path):
+def custom_torch_download(filename, ckpts_dir=annotator_ckpts_path):
     local_dir = os.path.join(get_dir(), 'checkpoints')
     model_path = os.path.join(local_dir, filename)
 
     if not os.path.exists(model_path):
-        local_dir = os.path.join(cache_dir, "torch")
+        print(f"Failed to find {model_path}.\n Downloading from pytorch.org")
+        local_dir = os.path.join(ckpts_dir, "torch")
         if not os.path.exists(local_dir):
             os.mkdir(local_dir)
 
@@ -258,14 +270,21 @@ def custom_torch_download(filename, cache_dir=annotator_ckpts_path):
                 download_url_to_file(url = model_url, dst = model_path)
                 assert check_hash_from_torch_hub(model_path, filename), f"Hash check failed as file {filename} is corrupted"
                 print("Hash check passed")
+    
+    print(f"model_path is {model_path}")
     return model_path
 
-def custom_hf_download(pretrained_model_or_path, filename, cache_dir=annotator_ckpts_path, subfolder='', use_symlinks=USE_SYMLINKS, repo_type="model"):
-    local_dir = os.path.join(cache_dir, pretrained_model_or_path)
+def custom_hf_download(pretrained_model_or_path, filename, cache_dir=temp_dir, ckpts_dir=annotator_ckpts_path, subfolder='', use_symlinks=USE_SYMLINKS, repo_type="model"):
+    
+    local_dir = os.path.join(ckpts_dir, pretrained_model_or_path)
     model_path = os.path.join(local_dir, *subfolder.split('/'), filename)
+
+    if len(str(model_path)) >= 255:
+        warnings.warn(f"Path {model_path} is too long, \n please change annotator_ckpts_path in config.yaml")
     
     if not os.path.exists(model_path):
         print(f"Failed to find {model_path}.\n Downloading from huggingface.co")
+        print(f"cacher folder is {cache_dir}, you can change it by custom_tmp_path in config.yaml")
         if use_symlinks:
             cache_dir_d = os.getenv("HUGGINGFACE_HUB_CACHE")
             if cache_dir_d is None:
@@ -279,8 +298,8 @@ def custom_hf_download(pretrained_model_or_path, filename, cache_dir=annotator_c
                 if not os.path.exists(cache_dir_d):
                     os.makedirs(cache_dir_d)
                 open(os.path.join(cache_dir_d, f"linktest_{filename}.txt"), "w")
-                os.link(os.path.join(cache_dir_d, f"linktest_{filename}.txt"), os.path.join(cache_dir, f"linktest_{filename}.txt"))
-                os.remove(os.path.join(cache_dir, f"linktest_{filename}.txt"))
+                os.link(os.path.join(cache_dir_d, f"linktest_{filename}.txt"), os.path.join(ckpts_dir, f"linktest_{filename}.txt"))
+                os.remove(os.path.join(ckpts_dir, f"linktest_{filename}.txt"))
                 os.remove(os.path.join(cache_dir_d, f"linktest_{filename}.txt"))
                 print("Using symlinks to download models. \n",\
                       "Make sure you have enough space on your cache folder. \n",\
@@ -290,9 +309,9 @@ def custom_hf_download(pretrained_model_or_path, filename, cache_dir=annotator_c
             except:
                 print("Maybe not able to create symlink. Disable using symlinks.")
                 use_symlinks = False
-                cache_dir_d = os.path.join(cache_dir, pretrained_model_or_path, "cache")
+                cache_dir_d = os.path.join(cache_dir, "ckpts", pretrained_model_or_path)
         else:
-            cache_dir_d = os.path.join(cache_dir, pretrained_model_or_path, "cache")
+            cache_dir_d = os.path.join(cache_dir, "ckpts", pretrained_model_or_path)
 
         model_path = hf_hub_download(repo_id=pretrained_model_or_path,
             cache_dir=cache_dir_d,
@@ -307,7 +326,10 @@ def custom_hf_download(pretrained_model_or_path, filename, cache_dir=annotator_c
         if not use_symlinks:
             try:
                 import shutil
-                shutil.rmtree(cache_dir_d)
+                shutil.rmtree(os.path.join(cache_dir, "ckpts"))
             except Exception as e :
                 print(e)
+
+    print(f"model_path is {model_path}")
+
     return model_path
