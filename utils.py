@@ -67,7 +67,10 @@ if os.path.exists('/stable-diffusion-cache/models/ckpts'):
             tgt_path = cache_path.replace('/stable-diffusion-cache/models/ckpts', annotator_ckpts_path)
             if not os.path.exists(tgt_path):
                 if not os.path.exists(os.path.dirname(tgt_path)):
-                    os.makedirs(os.path.dirname(tgt_path), exist_ok=True)
+                    try:
+                        os.makedirs(os.path.dirname(tgt_path), exist_ok=True)
+                    except:
+                        pass
                 ckpt_fp_file_pairs.append([cache_path, tgt_path])
                 # os.system(f'cp {cache_path} {tgt_path}')
     if not args.just_ui:
