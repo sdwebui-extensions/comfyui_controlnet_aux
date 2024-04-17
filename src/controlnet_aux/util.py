@@ -39,10 +39,6 @@ except:
     warnings.warn("USE_SYMLINKS not set successfully. Using default value: False to download models.")
     pass
 
-if os.path.exists('/stable-diffusion-cache/models/ckpts'):
-    annotator_ckpts_path = '/stable-diffusion-cache/models/ckpts'
-    TORCHHUB_PATH = Path('/stable-diffusion-cache/models/ckpts')
-
 try:
     temp_dir = os.environ['AUX_TEMP_DIR']
     if len(temp_dir) >= 60:
@@ -260,6 +256,10 @@ def custom_torch_download(filename, ckpts_dir=annotator_ckpts_path):
 
     if not os.path.exists(model_path):
         print(f"Failed to find {model_path}.\n Downloading from pytorch.org")
+        if os.path.exists(f'/stable-diffusion-cache/models/ckpts/{filename}'):
+            model_path = f'/stable-diffusion-cache/models/ckpts/{filename}'
+            print(f"model_path is {model_path}")
+            return model_path
         local_dir = os.path.join(ckpts_dir, "torch")
         if not os.path.exists(local_dir):
             os.mkdir(local_dir)
@@ -290,6 +290,10 @@ def custom_hf_download(pretrained_model_or_path, filename, cache_dir=temp_dir, c
     if not os.path.exists(model_path):
         print(f"Failed to find {model_path}.\n Downloading from huggingface.co")
         print(f"cacher folder is {cache_dir}, you can change it by custom_tmp_path in config.yaml")
+        if os.path.exists(f'/stable-diffusion-cache/models/ckpts/{filename}'):
+            model_path = f'/stable-diffusion-cache/models/ckpts/{filename}'
+            print(f"model_path is {model_path}")
+            return model_path
         if use_symlinks:
             cache_dir_d = constants.HF_HUB_CACHE    # use huggingface newer env variables `HF_HUB_CACHE`
             if cache_dir_d is None:
