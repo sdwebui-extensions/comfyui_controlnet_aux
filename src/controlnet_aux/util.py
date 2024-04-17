@@ -39,9 +39,9 @@ except:
     warnings.warn("USE_SYMLINKS not set successfully. Using default value: False to download models.")
     pass
 
-if os.path.exists('/stable-diffusion-cache/models/controlnet_aux'):
-    annotator_ckpts_path = '/stable-diffusion-cache/models/controlnet_aux'
-    TORCHHUB_PATH = Path('/stable-diffusion-cache/models/controlnet_aux')
+if os.path.exists('/stable-diffusion-cache/models/ckpts'):
+    annotator_ckpts_path = '/stable-diffusion-cache/models/ckpts'
+    TORCHHUB_PATH = Path('/stable-diffusion-cache/models/ckpts')
 
 try:
     temp_dir = os.environ['AUX_TEMP_DIR']
