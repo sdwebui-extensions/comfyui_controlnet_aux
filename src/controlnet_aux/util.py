@@ -303,8 +303,9 @@ def custom_hf_download(pretrained_model_or_path, filename, cache_dir=temp_dir, c
     if not os.path.exists(model_path):
         print(f"Failed to find {model_path}.\n Downloading from huggingface.co")
         print(f"cacher folder is {cache_dir}, you can change it by custom_tmp_path in config.yaml")
-        if os.path.exists(f'/stable-diffusion-cache/models/ckpts/{pretrained_model_or_path}/{filename}'):
-            model_path = f'/stable-diffusion-cache/models/ckpts/{pretrained_model_or_path}/{filename}'
+        cache_filename = os.path.join(pretrained_model_or_path, *subfolder.split('/'), filename)
+        if os.path.exists(f'/stable-diffusion-cache/models/ckpts/{cache_filename}'):
+            model_path = f'/stable-diffusion-cache/models/ckpts/{cache_filename}'
             print(f"model_path is {model_path}")
             return model_path
         if use_symlinks:
