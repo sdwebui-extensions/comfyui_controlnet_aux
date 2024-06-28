@@ -59,22 +59,7 @@ else:
         annotator_ckpts_path = str(Path(here, "./ckpts"))
     USE_SYMLINKS = False
     ORT_PROVIDERS = ["CUDAExecutionProvider", "DirectMLExecutionProvider", "OpenVINOExecutionProvider", "ROCMExecutionProvider", "CPUExecutionProvider", "CoreMLExecutionProvider"]
-if os.path.exists('/stable-diffusion-cache/models/ckpts'):
-    ckpt_fp_file_pairs = []
-    for upper_folder, _, filenames in os.walk('/stable-diffusion-cache/models/ckpts'):
-        for filename in filenames:
-            cache_path = os.path.join(upper_folder, filename)
-            tgt_path = cache_path.replace('/stable-diffusion-cache/models/ckpts', annotator_ckpts_path)
-            if not os.path.exists(tgt_path):
-                if not os.path.exists(os.path.dirname(tgt_path)):
-                    try:
-                        os.makedirs(os.path.dirname(tgt_path), exist_ok=True)
-                    except:
-                        pass
-                ckpt_fp_file_pairs.append([cache_path, tgt_path])
-                # os.system(f'cp {cache_path} {tgt_path}')
-    if not args.just_ui:
-        async_file_cp(ckpt_fp_file_pairs)
+
 TEMP_DIR = tempfile.gettempdir()
 os.environ['AUX_ANNOTATOR_CKPTS_PATH'] = annotator_ckpts_path
 os.environ['AUX_TEMP_DIR'] = str(TEMP_DIR)
