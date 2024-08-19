@@ -26,12 +26,12 @@ DIFFUSION_EDGE_MODEL_NAME = "hr16/Diffusion-Edge"
 METRIC3D_MODEL_NAME = "JUGGHM/Metric3D"
 
 DEPTH_ANYTHING_V2_MODEL_NAME_DICT = {
-    "depth_anything_v2_vits.pth": "depth-anything/Depth-Anything-V2-Small",
-    "depth_anything_v2_vitb.pth": "depth-anything/Depth-Anything-V2-Base",
-    "depth_anything_v2_vitl.pth": "depth-anything/Depth-Anything-V2-Large",
-    "depth_anything_v2_vitg.pth": "depth-anything/Depth-Anything-V2-Giant",
-    "depth_anything_v2_metric_vkitti_vitl.pth": "depth-anything/Depth-Anything-V2-Metric-VKITTI-Large",
-    "depth_anything_v2_metric_hypersim_vitl.pth": "depth-anything/Depth-Anything-V2-Metric-Hypersim-Large"
+    "depth_anything_v2_vits.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Small" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Small") else "depth-anything/Depth-Anything-V2-Small",
+    "depth_anything_v2_vitb.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Base" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Base") else "depth-anything/Depth-Anything-V2-Base",
+    "depth_anything_v2_vitl.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Large" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Large") else "depth-anything/Depth-Anything-V2-Large",
+    "depth_anything_v2_vitg.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Giant" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Giant") else "depth-anything/Depth-Anything-V2-Giant",
+    "depth_anything_v2_metric_vkitti_vitl.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Metric-VKITTI-Large" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Metric-VKITTI-Large") else "depth-anything/Depth-Anything-V2-Metric-VKITTI-Large",
+    "depth_anything_v2_metric_hypersim_vitl.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Metric-Hypersim-Large" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Metric-Hypersim-Large") else "depth-anything/Depth-Anything-V2-Metric-Hypersim-Large"
 }
 
 temp_dir = tempfile.gettempdir()
