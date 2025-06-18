@@ -114,7 +114,10 @@ class AIO_Preprocessor:
                     continue
 
                 default_values = { "INT": 0, "FLOAT": 0.0 }
+<<<<<<< HEAD
                 print("Debug. Type: ", type(input_type[0]), " of value ", input_type[0])
+=======
+>>>>>>> ori/main
                 if type(input_type[0]) is list:
                     for input_type_value in input_type[0]:
                         if input_type_value in default_values:
