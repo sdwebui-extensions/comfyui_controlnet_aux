@@ -8,6 +8,7 @@ import torch
 from PIL import Image
 from transformers import pipeline, AutoImageProcessor, ZoeDepthForDepthEstimation
 import os
+from comfy.cli_args import args
 
 # Local utility functions
 def HWC3(x):
@@ -93,8 +94,8 @@ class ZoeDetector:
     
     def __init__(self, model_name="Intel/zoedepth-nyu-kitti"):
         """Initialize ZoeDepth with specified model."""
-        if os.path.exists('/stable-diffusion-cache/huggingface'):
-            model_name = os.path.join("/stable-diffusion-cache/huggingface", model_name)
+        if os.path.exists(os.path.join(args.cache_root, 'huggingface')):
+            model_name = os.path.join(args.cache_root, 'huggingface', model_name)
         self.pipe = pipeline(task="depth-estimation", model=model_name)
         self.device = "cpu"
 

@@ -11,6 +11,7 @@ import torch
 from huggingface_hub import constants, hf_hub_download
 from torch.utils.model_zoo import load_url
 from ast import literal_eval
+from comfy.cli_args import args
 
 
 HF_MODEL_NAME = "lllyasviel/Annotators"
@@ -25,12 +26,12 @@ DIFFUSION_EDGE_MODEL_NAME = "hr16/Diffusion-Edge"
 METRIC3D_MODEL_NAME = "JUGGHM/Metric3D"
 
 DEPTH_ANYTHING_V2_MODEL_NAME_DICT = {
-    "depth_anything_v2_vits.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Small" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Small") else "depth-anything/Depth-Anything-V2-Small",
-    "depth_anything_v2_vitb.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Base" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Base") else "depth-anything/Depth-Anything-V2-Base",
-    "depth_anything_v2_vitl.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Large" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Large") else "depth-anything/Depth-Anything-V2-Large",
-    "depth_anything_v2_vitg.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Giant" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Giant") else "depth-anything/Depth-Anything-V2-Giant",
-    "depth_anything_v2_metric_vkitti_vitl.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Metric-VKITTI-Large" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Metric-VKITTI-Large") else "depth-anything/Depth-Anything-V2-Metric-VKITTI-Large",
-    "depth_anything_v2_metric_hypersim_vitl.pth": "/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Metric-Hypersim-Large" if os.path.exists("/stable-diffusion-cache/models/ckpts/depth-anything/Depth-Anything-V2-Metric-Hypersim-Large") else "depth-anything/Depth-Anything-V2-Metric-Hypersim-Large"
+    "depth_anything_v2_vits.pth": os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Small") if os.path.exists(os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Small")) else "depth-anything/Depth-Anything-V2-Small",
+    "depth_anything_v2_vitb.pth": os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Base") if os.path.exists(os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Base")) else "depth-anything/Depth-Anything-V2-Base",
+    "depth_anything_v2_vitl.pth": os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Large") if os.path.exists(os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Large")) else "depth-anything/Depth-Anything-V2-Large",
+    "depth_anything_v2_vitg.pth": os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Giant") if os.path.exists(os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Giant")) else "depth-anything/Depth-Anything-V2-Giant",
+    "depth_anything_v2_metric_vkitti_vitl.pth": os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Metric-VKITTI-Large") if os.path.exists(os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Metric-VKITTI-Large")) else "depth-anything/Depth-Anything-V2-Metric-VKITTI-Large",
+    "depth_anything_v2_metric_hypersim_vitl.pth": os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Metric-Hypersim-Large") if os.path.exists(os.path.join(args.cache_root, "models/ckpts/depth-anything/Depth-Anything-V2-Metric-Hypersim-Large")) else "depth-anything/Depth-Anything-V2-Metric-Hypersim-Large"
 }
 
 temp_dir = tempfile.gettempdir()
@@ -275,8 +276,8 @@ def custom_torch_download(filename, ckpts_dir=annotator_ckpts_path):
     
     if not os.path.exists(model_path):
         print(f"Downloading {filename} from pytorch.org...")
-        if os.path.exists(f'/stable-diffusion-cache/models/ckpts/torch/{filename}'):
-            model_path = f'/stable-diffusion-cache/models/ckpts/torch/{filename}'
+        if os.path.exists(os.path.join(args.cache_root, f'models/ckpts/torch/{filename}')):
+            model_path = os.path.join(args.cache_root, f'models/ckpts/torch/{filename}')
             print(f"model_path is {model_path}")
             return model_path
         try:
@@ -302,12 +303,12 @@ def custom_hf_download(pretrained_model_or_path, filename, cache_dir=temp_dir, c
         print(f"Failed to find {model_path}.\n Downloading from huggingface.co")
         print(f"cacher folder is {cache_dir}, you can change it by custom_tmp_path in config.yaml")
         cache_filename = os.path.join(pretrained_model_or_path, *subfolder.split('/'), filename)
-        if os.path.exists(f'/stable-diffusion-cache/models/ckpts/{cache_filename}'):
-            model_path = f'/stable-diffusion-cache/models/ckpts/{cache_filename}'
+        if os.path.exists(os.path.join(args.cache_root, f'models/ckpts/{cache_filename}')):
+            model_path = os.path.join(args.cache_root, f'models/ckpts/{cache_filename}')
             print(f"model_path is {model_path}")
             return model_path
-        if os.path.exists('/stable-diffusion-cache/huggingface'):
-            model_path = os.path.join('/stable-diffusion-cache/huggingface', cache_filename)
+        if os.path.exists(os.path.join(args.cache_root, 'huggingface', cache_filename)):
+            model_path = os.path.join(args.cache_root, 'huggingface', cache_filename)
             return model_path
         if use_symlinks:
             cache_dir_d = constants.HF_HUB_CACHE    # use huggingface newer env variables `HF_HUB_CACHE`

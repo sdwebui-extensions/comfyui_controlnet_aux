@@ -8,6 +8,7 @@ import torch
 from PIL import Image
 from transformers import pipeline
 import os
+from comfy.cli_args import args
 
 from custom_controlnet_aux.util import HWC3, common_input_validate, resize_image_with_pad
 
@@ -16,8 +17,9 @@ class DepthAnythingDetector:
     
     def __init__(self, model_name="LiheYoung/depth-anything-large-hf"):
         """Initialize DepthAnything with specified model."""
-        if os.path.exists("/stable-diffusion-cache/huggingface"):
-            model_name = os.path.join("/stable-diffusion-cache/huggingface", model_name)
+        cache_path = os.path.join(args.cache_root, "huggingface")
+        if os.path.exists(cache_path):
+            model_name = os.path.join(cache_path, model_name)
         self.pipe = pipeline(task="depth-estimation", model=model_name)
         self.device = "cpu"
 

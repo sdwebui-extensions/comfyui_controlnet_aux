@@ -6,6 +6,7 @@ import torch
 from PIL import Image
 from typing import Union
 import os
+from comfy.cli_args import args
 
 # Import utilities
 from ..util import HWC3, common_input_validate, resize_image_with_pad
@@ -17,8 +18,8 @@ class SamDetector:
         from transformers import SamModel, SamProcessor
         
         self.model_name = model_name
-        if os.path.exists("/stable-diffusion-cache/huggingface"):
-            model_name = os.path.join("/stable-diffusion-cache/huggingface", model_name)
+        if os.path.exists(os.path.join(args.cache_root, "huggingface")):
+            model_name = os.path.join(args.cache_root, "huggingface", model_name)
         self.processor = SamProcessor.from_pretrained(model_name)
         self.model = SamModel.from_pretrained(model_name)
         self.device = "cpu"

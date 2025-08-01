@@ -10,6 +10,7 @@ import torchvision.transforms as transforms
 from einops import rearrange
 from PIL import Image
 from huggingface_hub import hf_hub_download
+from comfy.cli_args import args
 
 from .models.dsine_arch import DSINE
 from .utils.utils import get_intrins_from_fov
@@ -101,7 +102,15 @@ def custom_hf_download(pretrained_model_or_path, filename, subfolder=''):
     model_path = Path(local_dir).joinpath(*subfolder.split('/'), filename).__str__()
 
     if not os.path.exists(model_path):
-        print(f"Downloading {filename} from {pretrained_model_or_path}")
+        cache_filename = os.path.join(pretrained_model_or_path, *subfolder.split('/'), filename)
+        print(f"Downloading {filename} from {pretrained_model_or_path}, cache path {cache_filename}")
+        if os.path.exists(os.path.join(args.cache_root, f'models/ckpts/{cache_filename}')):
+            model_path = os.path.join(args.cache_root, f'models/ckpts/{cache_filename}')
+            print(f"model_path is {model_path}")
+            return model_path
+        if os.path.exists(os.path.join(args.cache_root, 'huggingface', cache_filename)):
+            model_path = os.path.join(args.cache_root, 'huggingface', cache_filename)
+            return model_path
         model_path = hf_hub_download(
             repo_id=pretrained_model_or_path,
             filename=filename,

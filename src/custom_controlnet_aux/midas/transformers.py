@@ -7,6 +7,7 @@ import cv2
 from PIL import Image
 from typing import Union
 import os
+from comfy.cli_args import args
 
 # Import utilities
 from ..util import HWC3, common_input_validate, resize_image_with_pad
@@ -42,8 +43,8 @@ class MidasDetector:
                 model_name = model_mapping.get(model_type, "Intel/dpt-large")
         else:
             model_name = model_mapping.get(model_type, "Intel/dpt-large")
-        if os.path.exists('/stable-diffusion-cache/huggingface'):
-            model_name = os.path.join('/stable-diffusion-cache/huggingface', model_name)
+        if os.path.exists(os.path.join(args.cache_root, 'huggingface')):
+            model_name = os.path.join(args.cache_root, 'huggingface', model_name)
         
         return cls(model_name)
 
