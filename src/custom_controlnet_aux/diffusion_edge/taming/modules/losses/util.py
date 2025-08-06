@@ -1,6 +1,7 @@
 import os, hashlib
 import requests
 from tqdm import tqdm
+import folder_paths
 
 URL_MAP = {
     "vgg_lpips": "https://heibox.uni-heidelberg.de/f/607503859c864bc1b30b/?dl=1"
@@ -37,8 +38,8 @@ def get_ckpt_path(name, root, check=False):
     assert name in URL_MAP
     path = os.path.join(root, CKPT_MAP[name])
     if not os.path.exists(path) or (check and not md5_hash(path) == MD5_MAP[name]):
-        if os.path.exists(f'/stable-diffusion-cache/models/ckpts/{path}'):
-            return f'/stable-diffusion-cache/models/ckpts/{path}'
+        if os.path.exists(os.path.join(folder_paths.cache_dir, f'models/ckpts/{path}')):
+            return os.path.join(folder_paths.cache_dir, f'models/ckpts/{path}')
         print("Downloading {} model from {} to {}".format(name, URL_MAP[name], path))
         download(URL_MAP[name], path)
         md5 = md5_hash(path)

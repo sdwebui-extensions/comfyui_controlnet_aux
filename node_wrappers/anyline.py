@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import comfy.model_management as model_management
 import comfy.utils
+import folder_paths
 
 # Requires comfyui_controlnet_aux funcsions and classes
 from ..utils import common_annotator_call, INPUT, define_preprocessor_inputs
@@ -46,8 +47,8 @@ class AnyLinePreprocessor:
 
         # Process the image with MTEED model
         import os
-        if os.path.exists('/stable-diffusion-cache/models/ckpts/TheMistoAI/MistoLine/Anyline'):
-            mteed_model = TEDDetector.from_pretrained("/stable-diffusion-cache/models/ckpts/TheMistoAI/MistoLine", "MTEED.pth", subfolder="Anyline").to(self.device)
+        if os.path.exists(os.path.join(folder_paths.cache_dir, "models/ckpts/TheMistoAI/MistoLine")):
+            mteed_model = TEDDetector.from_pretrained(os.path.join(folder_paths.cache_dir, "models/ckpts/TheMistoAI/MistoLine"), "MTEED.pth", subfolder="Anyline").to(self.device)
         else:
             mteed_model = TEDDetector.from_pretrained("TheMistoAI/MistoLine", "MTEED.pth", subfolder="Anyline").to(self.device)
         mteed_result = common_annotator_call(mteed_model, image, resolution=resolution, show_pbar=False)
