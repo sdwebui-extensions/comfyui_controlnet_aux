@@ -30,8 +30,12 @@ class OneformerSegmentor:
         self.model_name = model_name
         if os.path.exists(os.path.join(args.cache_root, 'huggingface')):
             model_name = os.path.join(args.cache_root, 'huggingface', model_name)
-        self.processor = OneFormerProcessor.from_pretrained(model_name)
-        self.model = OneFormerForUniversalSegmentation.from_pretrained(model_name)
+        try:
+            self.processor = OneFormerProcessor.from_pretrained(model_name, local_files_only=True)
+            self.model = OneFormerForUniversalSegmentation.from_pretrained(model_name, local_files_only=True)
+        except Exception as e:
+            self.processor = OneFormerProcessor.from_pretrained(model_name)
+            self.model = OneFormerForUniversalSegmentation.from_pretrained(model_name)
         self.device = "cpu"
 
     @classmethod  

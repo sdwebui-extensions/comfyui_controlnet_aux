@@ -20,8 +20,12 @@ class SamDetector:
         self.model_name = model_name
         if os.path.exists(os.path.join(args.cache_root, "huggingface")):
             model_name = os.path.join(args.cache_root, "huggingface", model_name)
-        self.processor = SamProcessor.from_pretrained(model_name)
-        self.model = SamModel.from_pretrained(model_name)
+        try:
+            self.processor = SamProcessor.from_pretrained(model_name, local_files_only=True)
+            self.model = SamModel.from_pretrained(model_name, local_files_only=True)
+        except Exception as e:
+            self.processor = SamProcessor.from_pretrained(model_name)
+            self.model = SamModel.from_pretrained(model_name)
         self.device = "cpu"
 
     @classmethod  

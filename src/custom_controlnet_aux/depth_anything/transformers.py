@@ -17,10 +17,16 @@ class DepthAnythingDetector:
     
     def __init__(self, model_name="LiheYoung/depth-anything-large-hf"):
         """Initialize DepthAnything with specified model."""
+        from transformers import AutoImageProcessor, AutoModelForDepthEstimation
         cache_path = os.path.join(args.cache_root, "huggingface")
         if os.path.exists(cache_path):
             model_name = os.path.join(cache_path, model_name)
-        self.pipe = pipeline(task="depth-estimation", model=model_name)
+        try:
+            image_processor = AutoImageProcessor.from_pretrained(model_name, local_files_only=True)
+            model = AutoModelForDepthEstimation.from_pretrained(model_name, local_files_only=True)
+            self.pipe = pipeline(task="depth-estimation", model=model, image_processor=image_processor)
+        except Exception as e:
+            self.pipe = pipeline(task="depth-estimation", model=model_name)
         self.device = "cpu"
 
     @classmethod  
@@ -39,8 +45,7 @@ class DepthAnythingDetector:
     
     def to(self, device):
         """Move model to specified device."""
-        self.pipe.model = self.pipe.model.to(device)
-        self.pipe.device = device
+        self.pipe.model = self.pipe.model.to(device) 
         self.device = device
         return self
         

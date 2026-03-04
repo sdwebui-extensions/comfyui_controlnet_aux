@@ -96,7 +96,12 @@ class ZoeDetector:
         """Initialize ZoeDepth with specified model."""
         if os.path.exists(os.path.join(args.cache_root, 'huggingface')):
             model_name = os.path.join(args.cache_root, 'huggingface', model_name)
-        self.pipe = pipeline(task="depth-estimation", model=model_name)
+        try:
+            image_processor = AutoImageProcessor.from_pretrained(model_name, local_files_only=True)
+            model = ZoeDepthForDepthEstimation.from_pretrained(model_name, local_files_only=True)
+            self.pipe = pipeline(task="depth-estimation", model=model, image_processor=image_processor)
+        except Exception as e:
+            self.pipe = pipeline(task="depth-estimation", model=model_name)
         self.device = "cpu"
 
     @classmethod  
@@ -106,8 +111,7 @@ class ZoeDetector:
     
     def to(self, device):
         """Move model to specified device."""
-        self.pipe.model = self.pipe.model.to(device)
-        self.pipe.device = device
+        self.pipe.model = self.pipe.model.to(device) 
         self.device = device
         return self
         
@@ -151,7 +155,14 @@ class ZoeDepthAnythingDetector:
     
     def __init__(self, model_name="Intel/zoedepth-nyu-kitti"):
         """Initialize ZoeDepthAnything detector."""
-        self.pipe = pipeline(task="depth-estimation", model=model_name)
+        if os.path.exists(os.path.join(args.cache_root, 'huggingface')):
+            model_name = os.path.join(args.cache_root, 'huggingface', model_name)
+        try:
+            image_processor = AutoImageProcessor.from_pretrained(model_name, local_files_only=True)
+            model = ZoeDepthForDepthEstimation.from_pretrained(model_name, local_files_only=True)
+            self.pipe = pipeline(task="depth-estimation", model=model, image_processor=image_processor)
+        except Exception as e:
+            self.pipe = pipeline(task="depth-estimation", model=model_name)
         self.device = "cpu"
 
     @classmethod  
@@ -161,8 +172,7 @@ class ZoeDepthAnythingDetector:
     
     def to(self, device):
         """Move model to specified device."""
-        self.pipe.model = self.pipe.model.to(device)
-        self.pipe.device = device
+        self.pipe.model = self.pipe.model.to(device) 
         self.device = device
         return self
         
